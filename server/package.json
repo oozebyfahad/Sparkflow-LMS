@@ -1,0 +1,18 @@
+{
+  "name": "sparkflow-server",
+  "version": "1.0.0",
+  "description": "Sparkflow LMS Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
+    "sql.js": "^1.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

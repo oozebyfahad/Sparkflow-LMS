@@ -3,6 +3,9 @@ import { Plus, Trash2, Search, ChevronUp, ChevronDown, X, ClipboardCheck, Refres
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
+import { useAuth } from '../context/AuthContext';
+
+const CALLER_EDITABLE = ['deal_status', 'outreach_status', 'followup_date', 'followup_method', 'response_received', 'meeting_scheduled', 'proposal_sent', 'notes'];
 
 const DEAL_STATUSES = ['Prospecting', 'Contacted', 'Interested', 'Meeting Set', 'Proposal Sent', 'Closed Won', 'Closed Lost'];
 const INDUSTRIES = ['Marketing', 'Real Estate', 'Food & Beverage', 'Technology', 'Healthcare', 'Fitness', 'Construction', 'Legal', 'Events', 'Beauty & Wellness', 'Education', 'Finance', 'Retail', 'Other'];
@@ -142,6 +145,7 @@ function AddLeadModal({ onClose, onCreated }) {
 }
 
 export default function LeadTracker() {
+  const { isAdmin } = useAuth();
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -174,6 +178,7 @@ export default function LeadTracker() {
   }, [editingCell]);
 
   const startEdit = (id, field, value) => {
+    if (!isAdmin && !CALLER_EDITABLE.includes(field)) return;
     setEditingCell({ id, field });
     setEditValue(value ?? '');
   };
@@ -311,13 +316,15 @@ export default function LeadTracker() {
             <h1 className="text-xl font-bold text-gray-900">Lead Tracker</h1>
             <p className="text-sm text-gray-400 mt-0.5">{filtered.length} of {leads.length} leads</p>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl shadow-sm hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: '#3A86FF' }}
-          >
-            <Plus size={16} /> Add Lead
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl shadow-sm hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: '#3A86FF' }}
+            >
+              <Plus size={16} /> Add Lead
+            </button>
+          )}
         </div>
 
         {/* Filters Row */}
@@ -441,20 +448,24 @@ export default function LeadTracker() {
                   <Cell lead={lead} field="notes" className="max-w-[200px] truncate" />
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => navigate(`/audit/${lead.id}`)}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg text-purple-500 hover:bg-purple-50 transition-colors"
-                        title="Open Audit"
-                      >
-                        <ClipboardCheck size={14} />
-                      </button>
-                      <button
-                        onClick={() => setConfirmDelete(lead)}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-50 transition-colors"
-                        title="Delete Lead"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => navigate(`/audit/${lead.id}`)}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg text-purple-500 hover:bg-purple-50 transition-colors"
+                          title="Open Audit"
+                        >
+                          <ClipboardCheck size={14} />
+                        </button>
+                      )}
+                      {isAdmin && (
+                        <button
+                          onClick={() => setConfirmDelete(lead)}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-50 transition-colors"
+                          title="Delete Lead"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

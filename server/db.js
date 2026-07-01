@@ -1,4 +1,5 @@
 const initSqlJs = require('sql.js');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 
@@ -96,6 +97,26 @@ async function init() {
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  sqlDb.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'caller',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
+  if (userCount && userCount.count === 0) {
+    const adminHash = await bcrypt.hash('admin1234', 10);
+    const callerHash = await bcrypt.hash('caller1234', 10);
+    db.prepare('INSERT INTO users (name, email, password_hash, role) VALUES (?,?,?,?)').run('Admin', 'admin@sparkflow.pk', adminHash, 'admin');
+    db.prepare('INSERT INTO users (name, email, password_hash, role) VALUES (?,?,?,?)').run('Caller', 'caller@sparkflow.pk', callerHash, 'caller');
+    console.log('Seeded admin and caller users.');
+  }
 
   const count = db.prepare('SELECT COUNT(*) as count FROM leads').get();
   if (count && count.count === 0) {

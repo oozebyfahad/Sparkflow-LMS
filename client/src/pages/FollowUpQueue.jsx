@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Bell, Phone, Mail, Calendar, RefreshCw, CheckCircle, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../api';
-import { useNavigate } from 'react-router-dom';
 
 const STATUS_COLORS = {
   Prospecting: '#6B7280',
@@ -71,7 +70,6 @@ export default function FollowUpQueue() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rescheduleTarget, setRescheduleTarget] = useState(null);
-  const navigate = useNavigate();
   const today = new Date().toISOString().split('T')[0];
 
   const load = () => {
@@ -213,12 +211,6 @@ export default function FollowUpQueue() {
                       className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors"
                     >
                       <Calendar size={13} /> Reschedule
-                    </button>
-                    <button
-                      onClick={() => navigate(`/audit/${lead.id}`)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors"
-                    >
-                      View Lead
                     </button>
                   </div>
                 </div>

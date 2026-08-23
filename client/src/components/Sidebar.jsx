@@ -1,6 +1,6 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, ClipboardCheck, Phone, Mail, Bell, Zap, LogOut,
+  LayoutDashboard, Users, Mail, Bell, Zap, LogOut,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,15 +8,12 @@ const NAV_ITEMS = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/leads', icon: Users, label: 'Lead Tracker' },
   { path: '/follow-up', icon: Bell, label: 'Follow-Up Queue' },
-  { path: '/cold-call', icon: Phone, label: 'Cold Call Script' },
   { path: '/email-templates', icon: Mail, label: 'Email Templates' },
 ];
 
 export default function Sidebar() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, isAdmin } = useAuth();
-  const isAudit = location.pathname.startsWith('/audit');
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -56,36 +53,19 @@ export default function Sidebar() {
             to={path}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                isActive || (path === '/leads' && isAudit)
+                isActive
                   ? 'text-white shadow-sm'
                   : 'text-white/55 hover:text-white/90 hover:bg-white/8'
               }`
             }
             style={({ isActive }) =>
-              isActive || (path === '/leads' && isAudit) ? { backgroundColor: '#3A86FF' } : {}
+              isActive ? { backgroundColor: '#3A86FF' } : {}
             }
           >
             <Icon className="shrink-0" size={18} />
             {label}
           </NavLink>
         ))}
-
-        {isAdmin && (
-          <>
-            <div className="pt-4 pb-1">
-              <p className="px-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                Tools
-              </p>
-            </div>
-            <NavLink
-              to="/leads"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-white/55 hover:text-white/90 hover:bg-white/8"
-            >
-              <ClipboardCheck size={18} className="shrink-0" />
-              Audit Checklist
-            </NavLink>
-          </>
-        )}
       </nav>
 
       {/* User footer */}

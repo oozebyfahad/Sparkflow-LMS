@@ -5,16 +5,13 @@ import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import LeadTracker from './pages/LeadTracker';
-import AuditChecklist from './pages/AuditChecklist';
-import ColdCallScript from './pages/ColdCallScript';
 import EmailTemplates from './pages/EmailTemplates';
 import FollowUpQueue from './pages/FollowUpQueue';
 
-function ProtectedRoute({ children, adminOnly = false }) {
-  const { user, loading, isAdmin } = useAuth();
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  if (adminOnly && !isAdmin) return <Navigate to="/dashboard" replace />;
   return children;
 }
 
@@ -39,8 +36,6 @@ function AppShell() {
           <Route path="/login" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/leads" element={<ProtectedRoute><LeadTracker /></ProtectedRoute>} />
-          <Route path="/audit/:id" element={<ProtectedRoute adminOnly><AuditChecklist /></ProtectedRoute>} />
-          <Route path="/cold-call" element={<ProtectedRoute><ColdCallScript /></ProtectedRoute>} />
           <Route path="/email-templates" element={<ProtectedRoute><EmailTemplates /></ProtectedRoute>} />
           <Route path="/follow-up" element={<ProtectedRoute><FollowUpQueue /></ProtectedRoute>} />
         </Routes>

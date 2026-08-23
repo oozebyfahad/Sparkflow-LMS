@@ -4,8 +4,7 @@ const { getDb } = require('../db');
 const { adminOnly } = require('../middleware/auth');
 
 const ALLOWED_FIELDS = [
-  'business_name', 'industry', 'website_score', 'social_score', 'branding_score',
-  'video_score', 'contact_name', 'email', 'phone', 'primary_service', 'secondary_service',
+  'business_name', 'industry', 'contact_name', 'email', 'phone', 'primary_service', 'secondary_service',
   'package_value', 'outreach_channel', 'date_contacted', 'outreach_status', 'followup_date',
   'followup_method', 'response_received', 'meeting_scheduled', 'proposal_sent', 'deal_status', 'notes'
 ];

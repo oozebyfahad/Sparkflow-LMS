@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Trash2, Search, ChevronUp, ChevronDown, X, ClipboardCheck, RefreshCw, Filter } from 'lucide-react';
+import { Plus, Trash2, Search, ChevronUp, ChevronDown, X, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,16 +22,8 @@ const STATUS_STYLES = {
   'Closed Lost': 'bg-red-100 text-red-700',
 };
 
-const SCORE_COLOR = (v) => {
-  const n = parseInt(v);
-  if (!n) return 'text-gray-300';
-  if (n >= 8) return 'text-green-600 font-semibold';
-  if (n >= 5) return 'text-yellow-600 font-semibold';
-  return 'text-red-500 font-semibold';
-};
-
 const BLANK_LEAD = {
-  business_name: '', industry: '', website_score: '', social_score: '', branding_score: '', video_score: '',
+  business_name: '', industry: '',
   contact_name: '', email: '', phone: '', primary_service: '', secondary_service: '', package_value: '',
   outreach_channel: '', date_contacted: '', outreach_status: '', followup_date: '', followup_method: '',
   response_received: 'No', meeting_scheduled: 'No', proposal_sent: 'No', deal_status: 'Prospecting', notes: '',
@@ -91,18 +82,6 @@ function AddLeadModal({ onClose, onCreated }) {
             <Field label="Est. Package Value (PKR)"><input className={inp} type="number" value={form.package_value} onChange={e => set('package_value', e.target.value)} placeholder="e.g. 75000" /></Field>
 
             <div className="col-span-2 border-t border-gray-100 pt-4 mt-1">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Audit Scores (1–10)</p>
-              <div className="grid grid-cols-4 gap-3">
-                {['website_score', 'social_score', 'branding_score', 'video_score'].map(f => (
-                  <div key={f}>
-                    <label className="block text-xs font-medium text-gray-600 mb-1 capitalize">{f.replace('_score', '').replace('_', ' ')}</label>
-                    <input className={inp} type="number" min="1" max="10" value={form[f]} onChange={e => set(f, e.target.value)} placeholder="1–10" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="col-span-2 border-t border-gray-100 pt-4 mt-1">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Outreach Details</p>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Outreach Channel"><select className={sel} value={form.outreach_channel} onChange={e => set('outreach_channel', e.target.value)}><option value="">Select…</option>{CHANNELS.map(c => <option key={c}>{c}</option>)}</select></Field>
@@ -155,11 +134,9 @@ export default function LeadTracker() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterChannel, setFilterChannel] = useState('');
   const [filterIndustry, setFilterIndustry] = useState('');
-  const [filterLowScore, setFilterLowScore] = useState(false);
   const [sortField, setSortField] = useState('created_at');
   const [sortDir, setSortDir] = useState('desc');
   const [confirmDelete, setConfirmDelete] = useState(null);
-  const navigate = useNavigate();
   const inputRef = useRef(null);
 
   const today = new Date().toISOString().split('T')[0];
@@ -219,7 +196,6 @@ export default function LeadTracker() {
       if (filterStatus && l.deal_status !== filterStatus) return false;
       if (filterChannel && l.outreach_channel !== filterChannel) return false;
       if (filterIndustry && l.industry !== filterIndustry) return false;
-      if (filterLowScore && !([l.website_score, l.social_score, l.branding_score, l.video_score].some(s => s > 0 && s < 5))) return false;
       if (search) {
         const q = search.toLowerCase();
         return (l.business_name || '').toLowerCase().includes(q)
@@ -363,16 +339,6 @@ export default function LeadTracker() {
             <option value="">All Industries</option>
             {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
           </select>
-
-          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              className="accent-accent w-4 h-4 rounded"
-              checked={filterLowScore}
-              onChange={e => setFilterLowScore(e.target.checked)}
-            />
-            <Filter size={14} /> Audit Opps (score &lt; 5)
-          </label>
         </div>
       </div>
 
@@ -395,10 +361,6 @@ export default function LeadTracker() {
                 <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 w-10">#</th>
                 <Th label="Business" field="business_name" />
                 <Th label="Industry" field="industry" />
-                <Th label="Web" field="website_score" className="w-14" />
-                <Th label="Soc" field="social_score" className="w-12" />
-                <Th label="Brand" field="branding_score" className="w-14" />
-                <Th label="Video" field="video_score" className="w-14" />
                 <Th label="Contact" field="contact_name" />
                 <Th label="Email" field="email" />
                 <Th label="Phone" field="phone" />
@@ -418,10 +380,6 @@ export default function LeadTracker() {
                   <td className="px-3 py-2.5 text-xs text-gray-400 font-mono">{idx + 1}</td>
                   <Cell lead={lead} field="business_name" className="font-semibold text-gray-800 min-w-[140px]" />
                   <Cell lead={lead} field="industry" type="select" options={INDUSTRIES} />
-                  <td className={`px-3 py-2.5 text-xs text-center ${SCORE_COLOR(lead.website_score)}`} onClick={() => startEdit(lead.id, 'website_score', lead.website_score)} style={{ cursor: 'pointer' }}>{lead.website_score || '—'}</td>
-                  <td className={`px-3 py-2.5 text-xs text-center ${SCORE_COLOR(lead.social_score)}`} onClick={() => startEdit(lead.id, 'social_score', lead.social_score)} style={{ cursor: 'pointer' }}>{lead.social_score || '—'}</td>
-                  <td className={`px-3 py-2.5 text-xs text-center ${SCORE_COLOR(lead.branding_score)}`} onClick={() => startEdit(lead.id, 'branding_score', lead.branding_score)} style={{ cursor: 'pointer' }}>{lead.branding_score || '—'}</td>
-                  <td className={`px-3 py-2.5 text-xs text-center ${SCORE_COLOR(lead.video_score)}`} onClick={() => startEdit(lead.id, 'video_score', lead.video_score)} style={{ cursor: 'pointer' }}>{lead.video_score || '—'}</td>
                   <Cell lead={lead} field="contact_name" />
                   <Cell lead={lead} field="email" type="email" className="text-blue-600" />
                   <Cell lead={lead} field="phone" className="text-blue-600" />
@@ -448,15 +406,6 @@ export default function LeadTracker() {
                   <Cell lead={lead} field="notes" className="max-w-[200px] truncate" />
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {isAdmin && (
-                        <button
-                          onClick={() => navigate(`/audit/${lead.id}`)}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg text-purple-500 hover:bg-purple-50 transition-colors"
-                          title="Open Audit"
-                        >
-                          <ClipboardCheck size={14} />
-                        </button>
-                      )}
                       {isAdmin && (
                         <button
                           onClick={() => setConfirmDelete(lead)}

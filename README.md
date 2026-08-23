@@ -57,10 +57,8 @@ The client proxies `/api` requests to the server automatically.
 |------|-------------|
 | **Dashboard** | KPI cards, pipeline funnel, recent activity feed |
 | **Lead Tracker** | Full table with inline editing, filters, add/delete |
-| **Audit Checklist** | Per-lead audit scoring for Website, Social, Branding, Video |
-| **Cold Call Script** | Step-by-step call guide with objection handlers |
-| **Email Templates** | 4 templates with copy-to-clipboard and variable highlighting |
 | **Follow-Up Queue** | Overdue & due-today leads with quick actions |
+| **Email Templates** | 4 templates with copy-to-clipboard and variable highlighting |
 
 ## API Endpoints
 

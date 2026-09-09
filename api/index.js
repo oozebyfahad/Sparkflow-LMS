@@ -46,19 +46,6 @@ function adminOnly(req, res, next) {
   next();
 }
 
-const SEEDS = [
-  ['Peak Digital Solutions','Marketing','Sarah Johnson','sarah@peakdigital.com','0300-1234567','Social Media Management','SEO',85000,'Cold Call','2026-06-10','Replied','2026-06-25','Email','Yes','Yes','Yes','Closed Won','Signed 6-month contract.'],
-  ['Sunset Realty Group','Real Estate','Ahmed Khan','ahmed@sunsetrealty.pk','0321-9876543','Video Production','Social Media Management',120000,'Email','2026-06-15','Replied','2026-07-03','Call','Yes','Yes','Yes','Proposal Sent','Waiting on budget approval.'],
-  ['FreshBite Catering Co.','Food & Beverage','Maria Santos','maria@freshbite.pk','0333-5556677','Social Media Management','Photography',45000,'Instagram DM','2026-06-18','Replied','2026-07-01','Call','Yes','Yes','No','Meeting Set','Meeting confirmed. Full social package.'],
-  ['TechCore Solutions','Technology','Usman Ali','usman@techcore.pk','0312-4445566','Website Redesign','SEO',200000,'LinkedIn','2026-06-20','Replied','2026-07-05','Email','Yes','No','No','Interested','Asked for case studies and pricing.'],
-  ['Glamour Beauty Studio','Beauty & Wellness','Nadia Hussain','nadia@glamourbeauty.pk','0345-7778899','Social Media Management','Video Production',60000,'Cold Call','2026-06-22','Replied','2026-07-02','Call','Yes','No','No','Interested','Wants full content calendar.'],
-  ['Mountain View Dental','Healthcare','Dr. Rashid Malik','rashid@mountainviewdental.pk','0300-2223344','Website Redesign','SEO',90000,'Email','2026-06-24','Sent','2026-06-30','Email','No','No','No','Contacted','Sent intro email. No response yet.'],
-  ['QuickFit Gym','Fitness','Bilal Chaudhry','bilal@quickfitgym.pk','0322-8889900','Video Production','Social Media Management',75000,'Cold Call','2026-06-26','Voicemail','2026-07-03','Call','No','No','No','Prospecting','Left voicemail. Website needs overhaul.'],
-  ['Coastal Construction LLC','Construction','Farhan Sheikh','farhan@coastalconstruct.pk','0311-1112233','Website Redesign','Branding',150000,'LinkedIn','2026-06-12','Replied','2026-06-20','Email','Yes','Yes','Yes','Closed Lost','Went with competitor on price.'],
-  ['Miller & Chen Law Office','Legal','Jennifer Chen','jennifer@millerchen.pk','0301-4445566','SEO','Website Redesign',110000,'Email','2026-06-19','Replied','2026-07-04','Call','Yes','Yes','No','Meeting Set','Partners meeting scheduled. High-value prospect.'],
-  ['Velvet Events Planning','Events','Zara Siddiqui','zara@velvetevents.pk','0323-6667788','Social Media Management','Photography',55000,'Instagram DM','2026-06-23','Replied','2026-07-02','DM','Yes','No','No','Interested','Runs large corporate events.'],
-];
-
 async function initDb() {
   if (dbReady) return;
   const p = getPool();
@@ -87,13 +74,6 @@ async function initDb() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-
-  const { rows: lRows } = await p.query('SELECT COUNT(*) as count FROM leads');
-  if (parseInt(lRows[0].count) === 0) {
-    const cols = 'business_name,industry,contact_name,email,phone,primary_service,secondary_service,package_value,outreach_channel,date_contacted,outreach_status,followup_date,followup_method,response_received,meeting_scheduled,proposal_sent,deal_status,notes';
-    const ph = SEEDS[0].map((_, i) => `$${i + 1}`).join(',');
-    for (const row of SEEDS) await p.query(`INSERT INTO leads (${cols}) VALUES (${ph})`, row);
-  }
 
   const { rows: uRows } = await p.query('SELECT COUNT(*) as count FROM users');
   if (parseInt(uRows[0].count) === 0) {
